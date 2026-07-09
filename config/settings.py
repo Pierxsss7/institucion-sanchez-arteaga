@@ -17,9 +17,12 @@ SECRET_KEY = env('SECRET_KEY', default='django-insecure-1m7^(nwkqbraoue_)9-*qb7+
 
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = env('ALLOWED_HOSTS')
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
 
-CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=['https://*.railway.app'])
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[
+    'https://*.railway.app',
+    'https://*.onrender.com',
+])
 
 INSTALLED_APPS = [
     'django.contrib.admin',

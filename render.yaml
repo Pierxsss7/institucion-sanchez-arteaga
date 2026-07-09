@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: institucion-sanchez-arteaga
+    runtime: python
+    buildCommand: pip install -r requirements.txt && python manage.py migrate --noinput && python manage.py collectstatic --noinput
+    startCommand: gunicorn config.wsgi --access-logfile - --error-logfile -
+    envVars:
+      - key: DEBUG
+        value: "false"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: institucion-sanchez-arteaga-db
+          property: connectionString
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+
+databases:
+  - name: institucion-sanchez-arteaga-db
+    plan: free
+    databaseName: institucion_sanchez_arteaga
