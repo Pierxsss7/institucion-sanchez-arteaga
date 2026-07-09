@@ -1,2 +1,1 @@
-web: gunicorn config.wsgi --access-logfile - --error-logfile -
-release: python manage.py migrate --noinput && python manage.py cargar_datos_prueba && python manage.py collectstatic --noinput
+web: python manage.py migrate --noinput && python manage.py cargar_datos_prueba && gunicorn config.wsgi --access-logfile - --error-logfile -
