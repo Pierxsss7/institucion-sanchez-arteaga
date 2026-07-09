@@ -133,6 +133,11 @@
                         <i class="bi bi-grid-1x2-fill"></i> Panel Principal
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admin:index' %}">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
             </ul>
 
             <div class="menu-label">Gestión Institucional</div>
@@ -162,6 +167,11 @@
                         <i class="bi bi-journal-text"></i> Asignaciones
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'lista_horarios' %}">
+                        <i class="bi bi-calendar-week"></i> Horarios
+                    </a>
+                </li>
             </ul>
 
             <div class="menu-label">Control Académico</div>
@@ -183,7 +193,7 @@
                 </li>
             </ul>
 
-            <div class="menu-label">Administración</div>
+            <div class="menu-label">Reportes</div>
             <ul class="nav flex-column">
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'dashboard' %}">
@@ -214,6 +224,11 @@
                 <li class="nav-item">
                     <a class="nav-link sidebar-quick-action" href="/admin/academico/grupo/add/">
                         <i class="bi bi-plus-circle-fill"></i> Crear Grupo
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link sidebar-quick-action" href="/admin/academico/materia/add/">
+                        <i class="bi bi-book-half"></i> Crear Materia
                     </a>
                 </li>
             </ul>
