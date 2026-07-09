@@ -84,7 +84,7 @@ class Command(BaseCommand):
                 username=user,
                 defaults={
                     'first_name': nom, 'last_name': ape,
-                    'email': f'{user}@valdelomar.edu.pe',
+                    'email': f'{user}@sanchez-arteaga.edu.pe',
                     'rol': 'profesor', 'telefono': f'999{random.randint(100000, 999999)}',
                 },
             )
@@ -189,5 +189,5 @@ class Command(BaseCommand):
 
     def _crear_admin_si_no_existe(self):
         if not Usuario.objects.filter(username='admin').exists():
-            Usuario.objects.create_superuser('admin', 'admin@valdelomar.edu.pe', 'admin123', rol='admin')
+            Usuario.objects.create_superuser('admin', 'admin@sanchez-arteaga.edu.pe', 'admin123', rol='admin')
             self.stdout.write('  OK Admin recreado')
