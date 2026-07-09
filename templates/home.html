@@ -1,0 +1,1105 @@
+{% extends 'base.html' %}
+{% load academico_tags %}
+{% block title %}Panel Principal{% endblock %}
+{% block page_title %}Panel Principal{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+
+{% if user.rol == 'admin' or user.rol == 'director' %}
+<div class="row g-3 mb-4 fade-in">
+    <div class="col-md-3">
+        <div class="stat-card bg-gradient-primary position-relative">
+            <i class="bi bi-people-fill stat-icon"></i>
+            <div class="stat-number">{{ total_alumnos|default:"0" }}</div>
+            <div class="stat-label">Alumnos</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card bg-gradient-success position-relative">
+            <i class="bi bi-person-badge stat-icon"></i>
+            <div class="stat-number">{{ total_profesores|default:"0" }}</div>
+            <div class="stat-label">Profesores</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card bg-gradient-warning position-relative">
+            <i class="bi bi-book-fill stat-icon"></i>
+            <div class="stat-number">{{ total_materias|default:"0" }}</div>
+            <div class="stat-label">Materias</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card bg-gradient-info position-relative">
+            <i class="bi bi-layers-fill stat-icon"></i>
+            <div class="stat-number">{{ total_grados|default:"0" }}</div>
+            <div class="stat-label">Grados</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4 fade-in">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bi bi-calendar-check"></i> Estado de Asistencias
+            </div>
+            <div class="card-body chart-card-body">
+                <canvas id="attendanceChart" class="chart-canvas"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bi bi-graph-up"></i> Rendimiento Académico
+            </div>
+            <div class="card-body d-flex align-items-center justify-content-center" style="min-height:280px;">
+                {% widthratio calif_aprobadas total_calificaciones 100 as pct %}
+                <div class="progress-circle-wrapper">
+                    <svg class="progress-circle" viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="52" fill="none" stroke="#f0ece0" stroke-width="10"/>
+                        <circle cx="60" cy="60" r="52" fill="none"
+                            stroke="{% if pct >= 70 %}#C0392B{% elif pct >= 40 %}#F1C40F{% else %}#dc3545{% endif %}"
+                            stroke-width="10" stroke-linecap="round"
+                            stroke-dasharray="326.7"
+                            stroke-dashoffset="0"
+                            transform="rotate(-90 60 60)"
+                            style="stroke-dashoffset: calc(326.7 - (326.7 * {{ pct }} / 100)); transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);"/>
+                    </svg>
+                    <div class="progress-circle-center">
+                        <span class="progress-circle-pct">{{ pct }}%</span>
+                        <span class="progress-circle-label">Aprobados</span>
+                        <span class="progress-circle-sub">{{ calif_aprobadas }} de {{ total_calificaciones }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row g-3 fade-in mb-4">
+    {% if user.rol == 'admin' or user.rol == 'profesor' %}
+    <div class="col-md-3 col-6">
+        <a href="{% url 'lista_grados' %}" class="text-decoration-none">
+            <div class="card text-center p-3 h-100 nav-card">
+                <div class="card-body">
+                    <i class="bi bi-layers-fill" style="font-size: 2.2rem; color: var(--primary);"></i>
+                    <h6 class="mt-2">Grados</h6>
+                    <p class="text-muted small mb-0">Niveles educativos</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endif %}
+    <div class="col-md-3 col-6">
+        <a href="{% url 'lista_materias' %}" class="text-decoration-none">
+            <div class="card text-center p-3 h-100 nav-card">
+                <div class="card-body">
+                    <i class="bi bi-book-fill" style="font-size: 2.2rem; color: var(--emerald);"></i>
+                    <h6 class="mt-2">Materias</h6>
+                    <p class="text-muted small mb-0">Plan de estudios</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-6">
+        <a href="{% url 'lista_asignaciones' %}" class="text-decoration-none">
+            <div class="card text-center p-3 h-100 nav-card">
+                <div class="card-body">
+                    <i class="bi bi-journal-text" style="font-size: 2.2rem; color: var(--gold);"></i>
+                    <h6 class="mt-2">Asignaciones</h6>
+                    <p class="text-muted small mb-0">Clases y docentes</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-6">
+        <a href="{% url 'lista_asistencias' %}" class="text-decoration-none">
+            <div class="card text-center p-3 h-100 nav-card">
+                <div class="card-body">
+                    <i class="bi bi-calendar-check-fill" style="font-size: 2.2rem; color: var(--emerald);"></i>
+                    <h6 class="mt-2">Asistencias</h6>
+                    <p class="text-muted small mb-0">Control diario</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+{% if user.rol == 'alumno' %}
+
+<!-- LAYOUT: Main + Sidebar -->
+<div class="alumno-dashboard-layout fade-in">
+
+    <!-- ========== COLUMNA PRINCIPAL ========== -->
+    <div class="alumno-main-col">
+
+        <!-- HERO: Banner bienvenida -->
+        <div class="alumno-hero-banner">
+            <div class="alumno-hero-banner-text">
+                <h1 class="alumno-hero-hola">¡Hola, {{ user.first_name }}! 👋</h1>
+                {% if alumno_grupo %}
+                <p class="alumno-hero-info">
+                    Grado: <strong>{{ alumno_grupo.grado.nombre }}</strong>
+                    <span class="alumno-hero-sep">|</span>
+                    Sección: <strong>"{{ alumno_grupo.nombre }}"</strong>
+                    <span class="alumno-hero-sep">|</span>
+                    Turno: <strong>Mañana</strong>
+                </p>
+                {% endif %}
+                <blockquote class="alumno-hero-quote">
+                    "La educación es la arma más poderosa que puedes usar para cambiar el mundo."
+                    <cite>— Nelson Mandela</cite>
+                </blockquote>
+            </div>
+            <div class="alumno-hero-banner-art">
+                <div class="alumno-hero-3d">
+                    <div class="alumno-hero-3d-circle"></div>
+                    <div class="alumno-hero-3d-icon">🧑‍🎓</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STATS: 5 tarjetas -->
+        <div class="alumno-stats-row">
+            <div class="alumno-stat-card-ref">
+                <div class="alumno-stat-icon-ref" style="background:rgba(59,130,246,0.1);color:#3b82f6;">
+                    <i class="bi bi-book-fill"></i>
+                </div>
+                <div class="alumno-stat-text">
+                    <div class="alumno-stat-title-ref">Mis Cursos</div>
+                    <div class="alumno-stat-number-ref" style="color:#1e293b;">{{ alumno_stats.materias_count }}</div>
+                    <div class="alumno-stat-sub-ref" style="color:#64748b;">Cursos activos</div>
+                </div>
+            </div>
+            <div class="alumno-stat-card-ref">
+                <div class="alumno-stat-icon-ref" style="background:rgba(34,197,94,0.1);color:#22c55e;">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
+                <div class="alumno-stat-text">
+                    <div class="alumno-stat-title-ref">Promedio General</div>
+                    <div class="alumno-stat-number-ref" style="color:#1e293b;">{{ alumno_stats.promedio }}</div>
+                    <div class="alumno-stat-sub-ref" style="color:#64748b;">{% if alumno_stats.promedio >= 16 %}Muy bueno{% elif alumno_stats.promedio >= 11 %}Bueno{% elif alumno_stats.promedio > 0 %}Regular{% else %}Sin notas{% endif %}</div>
+                </div>
+            </div>
+            <div class="alumno-stat-card-ref">
+                <div class="alumno-stat-icon-ref" style="background:rgba(99,102,241,0.1);color:#6366f1;">
+                    <i class="bi bi-calendar2-check-fill"></i>
+                </div>
+                <div class="alumno-stat-text">
+                    <div class="alumno-stat-title-ref">Asistencia</div>
+                    <div class="alumno-stat-number-ref" style="color:#1e293b;">{{ alumno_stats.pct_asistencia }}%</div>
+                    <div class="alumno-stat-sub-ref" style="color:#64748b;">Este mes</div>
+                </div>
+            </div>
+            <div class="alumno-stat-card-ref">
+                <div class="alumno-stat-icon-ref" style="background:rgba(249,115,22,0.1);color:#f97316;">
+                    <i class="bi bi-clipboard2-check-fill"></i>
+                </div>
+                <div class="alumno-stat-text">
+                    <div class="alumno-stat-title-ref">Tareas Pendientes</div>
+                    <div class="alumno-stat-number-ref" style="color:#1e293b;">{{ tareas_pendientes|default:"0" }}</div>
+                    <div class="alumno-stat-sub-ref" style="color:#64748b;">Por entregar</div>
+                </div>
+            </div>
+            <div class="alumno-stat-card-ref">
+                <div class="alumno-stat-icon-ref" style="background:rgba(244,63,94,0.1);color:#f43f5e;">
+                    <i class="bi bi-star-fill"></i>
+                </div>
+                <div class="alumno-stat-text">
+                    <div class="alumno-stat-title-ref">Conducta</div>
+                    <div class="alumno-stat-number-ref" style="color:#1e293b;">Excelente</div>
+                    <div class="alumno-stat-sub-ref" style="color:#64748b;">Sin observaciones</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW: Rendimiento Académico + Asistencia del Mes -->
+        <div class="row g-4 mb-4">
+            <!-- Rendimiento Académico (barras) -->
+            <div class="col-lg-7">
+                <div class="card alumno-card h-100">
+                    <div class="alumno-card-header">
+                        <div class="alumno-card-header-left">
+                            <h6 class="alumno-card-title">Rendimiento Académico</h6>
+                        </div>
+                        <div class="alumno-card-header-right">
+                            <select class="alumno-select-periodo">
+                                <option>Este bimestre</option>
+                                {% for p in alumno_por_periodo %}
+                                <option>{{ p.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="alumno-card-body">
+                        {% if alumno_calif_por_materia %}
+                        <div class="alumno-chart-bars">
+                            {% for m in alumno_calif_por_materia %}
+                            <div class="alumno-bar-col">
+                                <div class="alumno-bar-value">{{ m.promedio }}</div>
+                                <div class="alumno-bar-track">
+                                    <div class="alumno-bar-fill"
+                                         style="height: {% widthratio m.promedio 20 100 %}%;
+                                         background: {% cycle '#3b82f6' '#22c55e' '#a855f7' '#f97316' '#ef4444' '#06b6d4' '#eab308' '#ec4899' %};">
+                                    </div>
+                                </div>
+                                <div class="alumno-bar-label">{{ m.nombre|truncatechars:12 }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="alumno-empty">
+                            <i class="bi bi-bar-chart"></i>
+                            <p>Aún no tienes calificaciones registradas.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Asistencia del Mes (donut) -->
+            <div class="col-lg-5">
+                <div class="card alumno-card h-100">
+                    <div class="alumno-card-header">
+                        <h6 class="alumno-card-title">Asistencia del Mes</h6>
+                    </div>
+                    <div class="alumno-card-body">
+                        <div class="alumno-donut-layout">
+                            <div class="alumno-donut-wrapper">
+                                <svg viewBox="0 0 120 120" class="alumno-donut-svg">
+                                    <circle cx="60" cy="60" r="50" fill="none" stroke="#f0ece0" stroke-width="12"/>
+                                    <circle cx="60" cy="60" r="50" fill="none"
+                                        stroke="#22c55e" stroke-width="12" stroke-linecap="round"
+                                        stroke-dasharray="314.2"
+                                        stroke-dashoffset="0"
+                                        transform="rotate(-90 60 60)"
+                                        style="stroke-dashoffset: calc(314.2 - (314.2 * {{ alumno_stats.pct_asistencia }} / 100)); transition: stroke-dashoffset 1.2s ease;"/>
+                                </svg>
+                                <div class="alumno-donut-center">
+                                    <span class="alumno-donut-pct">{{ alumno_stats.pct_asistencia }}%</span>
+                                    <span class="alumno-donut-label">Asistencia</span>
+                                </div>
+                            </div>
+                            <div class="alumno-donut-legend">
+                                <div class="alumno-legend-item">
+                                    <span class="alumno-legend-dot" style="background:#22c55e;"></span>
+                                    <span class="alumno-legend-text">Días presentes</span>
+                                    <span class="alumno-legend-val">{{ alumno_stats.asistencias_presente }}</span>
+                                </div>
+                                <div class="alumno-legend-item">
+                                    <span class="alumno-legend-dot" style="background:#ef4444;"></span>
+                                    <span class="alumno-legend-text">Días ausentes</span>
+                                    <span class="alumno-legend-val">{{ alumno_stats.asistencias_falta }}</span>
+                                </div>
+                                <div class="alumno-legend-item">
+                                    <span class="alumno-legend-dot" style="background:#f97316;"></span>
+                                    <span class="alumno-legend-text">Tardanzas</span>
+                                    <span class="alumno-legend-val">{{ alumno_stats.asistencias_tarde }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{% url 'mis_asistencias' %}" class="alumno-card-footer-link">
+                            <i class="bi bi-arrow-right"></i> Ver historial completo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLA: Mis Cursos -->
+        <div class="card alumno-card mb-4">
+            <div class="alumno-card-header">
+                <h6 class="alumno-card-title">Mis Cursos</h6>
+            </div>
+            <div class="alumno-card-body p-0">
+                {% if alumno_cursos_detalle %}
+                <div class="alumno-table-wrapper">
+                    <table class="alumno-cursos-table">
+                        <thead>
+                            <tr>
+                                <th>Curso</th>
+                                <th>Docente</th>
+                                <th>Última Nota</th>
+                                <th>Promedio</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in alumno_cursos_detalle %}
+                            <tr>
+                                <td>
+                                    <div class="alumno-curso-name">
+                                        <span class="alumno-curso-dot" style="background:{% cycle '#3b82f6' '#22c55e' '#a855f7' '#f97316' '#ef4444' '#06b6d4' '#eab308' '#ec4899' %};"></span>
+                                        {{ c.materia.nombre }}
+                                    </div>
+                                </td>
+                                <td>Prof. {{ c.profesor.get_full_name|default:c.profesor.username }}</td>
+                                <td>
+                                    {% if c.ultima_nota %}
+                                    <span class="alumno-badge-nota" style="background:{% if c.ultima_nota >= 16 %}rgba(34,197,94,0.1);color:#22c55e{% elif c.ultima_nota >= 11 %}rgba(249,115,22,0.1);color:#f97316{% else %}rgba(239,68,68,0.1);color:#ef4444{% endif %};">{{ c.ultima_nota }}</span>
+                                    {% else %}
+                                    <span class="alumno-badge-nota" style="background:#f0ece0;color:#999;">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if c.promedio %}
+                                    <strong style="color:{% if c.promedio >= 16 %}#22c55e{% elif c.promedio >= 11 %}#f97316{% else %}#ef4444{% endif %};">{{ c.promedio }}</strong>
+                                    {% else %}
+                                    <span style="color:#999;">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'lista_calificaciones' %}" class="alumno-btn-curso">Ver curso</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alumno-empty">
+                    <i class="bi bi-book"></i>
+                    <p>No tienes cursos asignados aún.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ========== COLUMNA LATERAL ========== -->
+    <div class="alumno-side-col">
+
+        <!-- Próximas Evaluaciones -->
+        <div class="card alumno-card mb-4">
+            <div class="alumno-card-header">
+                <h6 class="alumno-card-title">Próximas Evaluaciones</h6>
+                <a href="{% url 'lista_calificaciones' %}" class="alumno-card-link-sm">Ver todas</a>
+            </div>
+            <div class="alumno-card-body p-0">
+                {% if mis_calificaciones %}
+                <div class="alumno-side-list">
+                    {% for c in mis_calificaciones|slice:":3" %}
+                    <div class="alumno-side-item">
+                        <div class="alumno-side-icon" style="background:rgba(59,130,246,0.1);color:#3b82f6;">
+                            <i class="bi bi-journal-text"></i>
+                        </div>
+                        <div class="alumno-side-info">
+                            <div class="alumno-side-title">Examen de {{ c.materia.nombre|truncatechars:18 }}</div>
+                            <div class="alumno-side-sub">{{ c.periodo.nombre|truncatechars:20 }}</div>
+                        </div>
+                        <div class="alumno-side-action">
+                            <i class="bi bi-calendar3"></i>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alumno-empty-small">
+                    <i class="bi bi-journal"></i>
+                    <p>No hay evaluaciones próximas.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Comunicados Recientes -->
+        <div class="card alumno-card mb-4">
+            <div class="alumno-card-header">
+                <h6 class="alumno-card-title">Comunicados Recientes</h6>
+                <a href="#" class="alumno-card-link-sm">Ver todas</a>
+            </div>
+            <div class="alumno-card-body p-0">
+                {% if comunicados_recientes %}
+                <div class="alumno-side-list">
+                    {% for a in comunicados_recientes|slice:":3" %}
+                    <div class="alumno-side-item">
+                        <div class="alumno-side-icon" style="background:rgba(34,197,94,0.1);color:#22c55e;">
+                            <i class="bi bi-megaphone"></i>
+                        </div>
+                        <div class="alumno-side-info">
+                            <div class="alumno-side-title">{{ a.titulo|truncatechars:22 }}</div>
+                            <div class="alumno-side-sub">{{ a.fecha_creacion|date:'d/m/Y' }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alumno-empty-small">
+                    <i class="bi bi-megaphone"></i>
+                    <p>No hay comunicados recientes.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Próximas Tareas -->
+        <div class="card alumno-card mb-4">
+            <div class="alumno-card-header">
+                <h6 class="alumno-card-title">Próximas Tareas</h6>
+                <a href="{% url 'lista_tareas' %}" class="alumno-card-link-sm">Ver todas</a>
+            </div>
+            <div class="alumno-card-body p-0">
+                {% if proximas_tareas_alumno %}
+                <div class="alumno-side-list">
+                    {% for t in proximas_tareas_alumno|slice:":3" %}
+                    <div class="alumno-side-item">
+                        <div class="alumno-side-icon" style="background:rgba(168,85,247,0.1);color:#a855f7;">
+                            <i class="bi bi-journal-richtext"></i>
+                        </div>
+                        <div class="alumno-side-info">
+                            <div class="alumno-side-title">{{ t.titulo|truncatechars:22 }}</div>
+                            <div class="alumno-side-sub">{{ t.materia.nombre|truncatechars:18 }}</div>
+                        </div>
+                        <div class="alumno-side-date">
+                            {{ t.fecha_entrega|date:'d M' }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alumno-empty-small">
+                    <i class="bi bi-check2-circle"></i>
+                    <p>No hay tareas pendientes.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Evento Próximo -->
+        <div class="alumno-evento-card">
+            <div class="alumno-evento-header">
+                <h6 class="alumno-evento-title">Evento Próximo</h6>
+                <a href="#" class="alumno-card-link-sm" style="color:#fff;">Ver calendario →</a>
+            </div>
+            <div class="alumno-evento-body">
+                <div class="alumno-evento-icon">
+                    <i class="bi bi-calendar-event"></i>
+                </div>
+                <div>
+                    <div class="alumno-evento-name">Día del Logro</div>
+                    <div class="alumno-evento-date">31 de mayo, 2024</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+{% if user.rol == 'profesor' %}
+{# ROW 1: Profile + Schedule #}
+<div class="row g-4 mt-2 fade-in">
+    <div class="col-md-5">
+        <div class="card h-100 border-0 shadow-sm" style="border-radius:16px;">
+            <div class="card-body p-4">
+                <div class="text-center mb-3">
+                    {% if user.foto %}
+                    <img src="{{ user.foto.url }}" alt="{{ user.get_full_name }}"
+                         style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:4px solid var(--primary);box-shadow:0 4px 14px rgba(26,71,49,0.15);">
+                    {% else %}
+                    <div class="user-avatar" style="width:100px;height:100px;font-size:2.8rem;margin:0 auto;border:4px solid var(--primary);">
+                        {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="text-center mb-3">
+                    <h4 class="mb-1 fw-bold" style="color:var(--primary);">{{ user.get_full_name }}</h4>
+                    <span class="badge px-3 py-1" style="background:var(--emerald);color:#fff;font-size:0.8rem;font-weight:500;">{{ user.get_rol_display }}</span>
+                </div>
+                <div style="background:#f8f7f4;border-radius:12px;padding:14px;">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-person-badge" style="color:var(--primary);font-size:0.9rem;"></i>
+                                <div>
+                                    <small class="text-muted d-block" style="font-size:0.65rem;line-height:1;">DNI</small>
+                                    <span style="font-size:0.85rem;font-weight:600;">{{ user.dni|default:'—' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-envelope" style="color:var(--gold);font-size:0.9rem;"></i>
+                                <div>
+                                    <small class="text-muted d-block" style="font-size:0.65rem;line-height:1;">Email</small>
+                                    <span style="font-size:0.85rem;font-weight:600;">{{ user.email|default:'—' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-telephone" style="color:var(--emerald);font-size:0.9rem;"></i>
+                                <div>
+                                    <small class="text-muted d-block" style="font-size:0.65rem;line-height:1;">Teléfono</small>
+                                    <span style="font-size:0.85rem;font-weight:600;">{{ user.telefono|default:'—' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-calendar" style="color:#F1C40F;font-size:0.9rem;"></i>
+                                <div>
+                                    <small class="text-muted d-block" style="font-size:0.65rem;line-height:1;">Nacimiento</small>
+                                    <span style="font-size:0.85rem;font-weight:600;">{{ user.fecha_nacimiento|date:'d/m/Y'|default:'—' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="my-2" style="border-color:#e8e4dc;">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <i class="bi bi-bookmark" style="color:var(--primary);font-size:0.9rem;"></i>
+                        <div>
+                            <small class="text-muted d-block" style="font-size:0.65rem;line-height:1;">Especialidad</small>
+                            <span style="font-size:0.85rem;font-weight:600;">{{ user.especialidad|default:'No especificada' }}</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-award" style="color:var(--gold);font-size:0.9rem;"></i>
+                        <div>
+                            <small class="text-muted d-block" style="font-size:0.65rem;line-height:1;">Título Profesional</small>
+                            <span style="font-size:0.85rem;font-weight:600;">{{ user.titulo_profesional|default:'No especificado' }}</span>
+                        </div>
+                    </div>
+                    {% if user.direccion %}
+                    <hr class="my-2" style="border-color:#e8e4dc;">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-geo-alt" style="color:#dc3545;font-size:0.9rem;"></i>
+                        <div>
+                            <small class="text-muted d-block" style="font-size:0.65rem;line-height:1;">Dirección</small>
+                            <span style="font-size:0.85rem;font-weight:600;">{{ user.direccion }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="row g-2 mt-3 text-center">
+                    <div class="col-4">
+                        <div style="background:#f0f7f3;border-radius:12px;padding:10px;">
+                            <strong style="font-size:1.4rem;color:var(--primary);display:block;">{{ mis_asignaciones|length }}</strong>
+                            <small class="text-muted" style="font-size:0.7rem;">Clases</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div style="background:#f0f7f3;border-radius:12px;padding:10px;">
+                            <strong style="font-size:1.4rem;color:var(--emerald);display:block;">{{ total_mis_alumnos }}</strong>
+                            <small class="text-muted" style="font-size:0.7rem;">Alumnos</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div style="background:#f0f7f3;border-radius:12px;padding:10px;">
+                            <strong style="font-size:1.4rem;color:var(--gold);display:block;">{{ mis_horarios|length }}</strong>
+                            <small class="text-muted" style="font-size:0.7rem;">Horas/sem</small>
+                        </div>
+                    </div>
+                </div>
+                <a href="{% url 'perfil' %}" class="btn btn-outline-primary w-100 mt-3" style="border-radius:10px;">
+                    <i class="bi bi-pencil"></i> Editar Perfil
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="card h-100 border-0 shadow-sm" style="border-radius:16px;">
+            <div class="card-header d-flex align-items-center justify-content-between gap-2" style="background:transparent;border-bottom:1px solid #f0ece0;padding:14px 20px;">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-calendar-week" style="color:var(--primary);"></i>
+                    <strong style="color:var(--primary);">Horario de Clases</strong>
+                </div>
+                <a href="{% url 'mis_horarios' %}" class="btn btn-sm btn-outline-primary" style="border-radius:8px;">
+                    <i class="bi bi-eye"></i> Ver completo
+                </a>
+            </div>
+            <div class="card-body p-3">
+                {% if mis_horarios %}
+                <div style="overflow-x:auto;">
+                    <table class="table table-sm table-bordered mb-0" style="font-size:0.75rem;">
+                        <thead>
+                            <tr class="text-center">
+                                <th style="background:var(--primary);color:#fff;width:50px;">Hora</th>
+                                {% for d, label in dia_labels %}
+                                <th style="background:{% cycle '#922B21' '#C0392B' as headcolor %};color:#fff;min-width:80px;">{{ label|slice:':3' }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for slot in horario_grid %}
+                            <tr>
+                                <td class="text-center fw-semibold align-middle" style="background:#f8f7f4;font-size:0.7rem;white-space:nowrap;">{{ slot.hora }}</td>
+                                {% for d, _ in dia_labels %}
+                                <td class="text-center align-middle" style="padding:3px;">
+                                    {% for c in slot.dias|get_item:d %}
+                                    <div style="background:#e8f5e9;border-radius:6px;padding:3px 2px;border-left:3px solid var(--primary);margin-bottom:2px;">
+                                        <strong style="font-size:0.7rem;color:var(--primary);display:block;">{{ c.materia.nombre|truncatechars:14 }}</strong>
+                                        <small style="font-size:0.55rem;color:#666;">{{ c.grupo.grado.nombre|truncatechars:10 }}</small>
+                                    </div>
+                                    {% empty %}
+                                    <span style="color:#ddd;">—</span>
+                                    {% endfor %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-2 text-end">
+                    <small class="text-muted">
+                        <a href="{% url 'mis_horarios' %}" style="color:var(--primary);font-weight:500;">Ver horario completo →</a>
+                    </small>
+                </div>
+                {% else %}
+                <div class="empty-state py-3">
+                    <i class="bi bi-calendar-week"></i>
+                    <p>No tienes horario asignado.</p>
+                    <small class="text-muted">Solicita al director que registre tu horario.</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ROW 2: Classes + Upcoming Tasks #}
+<div class="row g-4 mt-2 fade-in">
+    <div class="col-md-7">
+        <div class="card border-0 shadow-sm" style="border-radius:16px;">
+            <div class="card-header d-flex align-items-center gap-2" style="background:transparent;border-bottom:1px solid #f0ece0;padding:14px 20px;">
+                <i class="bi bi-journal-text" style="color:var(--primary);"></i>
+                <strong style="color:var(--primary);">Mis Clases</strong>
+                <a href="{% url 'lista_asignaciones' %}" class="btn btn-sm btn-outline-secondary ms-auto" style="border-radius:8px;">
+                    <i class="bi bi-eye"></i> Todas
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if mis_asignaciones %}
+                <div style="padding:6px;">
+                    {% for a in mis_asignaciones %}
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #f5f2ec;"
+                         onmouseover="this.style.background='#faf8f5'" onmouseout="this.style.background='transparent'">
+                        <div>
+                            <div style="font-weight:600;font-size:0.85rem;color:var(--dark);">{{ a.materia.nombre }}</div>
+                            <small style="color:#8a8578;">
+                                <i class="bi bi-people"></i> {{ a.grupo.grado.nombre }} - Grupo {{ a.grupo.nombre }}
+                            </small>
+                        </div>
+                        <div class="d-flex gap-1">
+                            <a href="{% url 'tomar_asistencia' a.id %}" class="btn btn-sm btn-success" style="border-radius:8px;white-space:nowrap;">
+                                <i class="bi bi-calendar-check"></i>
+                            </a>
+                            <a href="{% url 'alumnos_por_grupo' a.grupo.id %}" class="btn btn-sm btn-outline-primary" style="border-radius:8px;white-space:nowrap;" title="Ver alumnos">
+                                <i class="bi bi-people"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state py-4">
+                    <i class="bi bi-journal-text"></i>
+                    <p>No tienes clases asignadas</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <div class="card border-0 shadow-sm" style="border-radius:16px;">
+            <div class="card-header d-flex align-items-center gap-2" style="background:transparent;border-bottom:1px solid #f0ece0;padding:14px 20px;">
+                <i class="bi bi-clock" style="color:var(--gold);"></i>
+                <strong style="color:var(--gold);">Próximas Tareas</strong>
+                <a href="{% url 'lista_tareas' %}" class="btn btn-sm btn-outline-secondary ms-auto" style="border-radius:8px;">
+                    <i class="bi bi-eye"></i> Ver todas
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if proximas_tareas %}
+                <div style="padding:6px;">
+                    {% for t in proximas_tareas %}
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #f5f2ec;"
+                         onmouseover="this.style.background='#faf8f5'" onmouseout="this.style.background='transparent'">
+                        <div>
+                            <div style="font-weight:600;font-size:0.85rem;color:var(--dark);">{{ t.titulo|truncatechars:28 }}</div>
+                            <small style="color:#8a8578;">
+                                <i class="bi bi-book"></i> {{ t.materia.nombre }} · 
+                                <i class="bi bi-people"></i> {{ t.grupo.grado.nombre }} - {{ t.grupo.nombre }}
+                            </small>
+                        </div>
+                        <span class="badge" style="background:{% if t.fecha_entrega <= today %}var(--danger){% else %}#F1C40F{% endif %};color:#fff;white-space:nowrap;">
+                            {{ t.fecha_entrega|date:'d/m' }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="p-2 text-center border-top" style="background:#faf8f5;">
+                    <a href="{% url 'crear_tarea' %}" class="btn btn-sm btn-primary" style="border-radius:8px;">
+                        <i class="bi bi-plus-circle"></i> Nueva Tarea
+                    </a>
+                </div>
+                {% else %}
+                <div class="empty-state py-3">
+                    <i class="bi bi-check2-circle" style="color:var(--emerald);"></i>
+                    <p>No hay tareas próximas vencimiento.</p>
+                    <a href="{% url 'crear_tarea' %}" class="btn btn-sm btn-primary" style="border-radius:8px;">
+                        <i class="bi bi-plus-circle"></i> Crear Tarea
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ROW 3: Stats + Announcements #}
+<div class="row g-4 mt-2 fade-in">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm" style="border-radius:16px;">
+            <div class="card-header d-flex align-items-center gap-2" style="background:transparent;border-bottom:1px solid #f0ece0;padding:14px 20px;">
+                <i class="bi bi-bar-chart" style="color:var(--emerald);"></i>
+                <strong style="color:var(--emerald);">Estadísticas Académicas</strong>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3 text-center">
+                    <div class="col-4">
+                        <div style="background:#f0f7f3;border-radius:12px;padding:14px 8px;">
+                            <div style="font-size:1.8rem;font-weight:700;color:var(--emerald);">{{ mis_notas_total }}</div>
+                            <small class="text-muted" style="font-size:0.7rem;">Notas registradas</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div style="background:#f0f7f3;border-radius:12px;padding:14px 8px;">
+                            <div style="font-size:1.8rem;font-weight:700;color:var(--primary);">{{ mis_notas_aprobadas }}</div>
+                            <small class="text-muted" style="font-size:0.7rem;">Aprobadas</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div style="background:#f0f7f3;border-radius:12px;padding:14px 8px;">
+                            <div style="font-size:1.8rem;font-weight:700;color:var(--gold);">{{ mis_notas_promedio }}</div>
+                            <small class="text-muted" style="font-size:0.7rem;">Promedio</small>
+                        </div>
+                    </div>
+                </div>
+                <hr style="border-color:#f0ece0;">
+                <div class="row g-3 text-center">
+                    <div class="col-6">
+                        <div style="border-radius:12px;padding:10px;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <small class="text-muted" style="font-size:0.7rem;">Asistencia</small>
+                                <small style="font-weight:600;font-size:0.8rem;">
+                                    {% if mis_asist_total %}
+                                    {% widthratio mis_asist_presente mis_asist_total 100 as pct_asist %}
+                                    {{ pct_asist }}%
+                                    {% else %}0%{% endif %}
+                                </small>
+                            </div>
+                            <div style="height:8px;background:#f0ece0;border-radius:10px;">
+                                <div style="height:8px;width:{% if mis_asist_total %}{{ pct_asist }}{% else %}0{% endif %}%;background:var(--emerald);border-radius:10px;transition:width 1s;"></div>
+                            </div>
+                            <small class="text-muted" style="font-size:0.6rem;">{{ mis_asist_presente }} de {{ mis_asist_total }} presentes</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div style="border-radius:12px;padding:10px;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <small class="text-muted" style="font-size:0.7rem;">Rendimiento</small>
+                                <small style="font-weight:600;font-size:0.8rem;">
+                                    {% if mis_notas_total %}
+                                    {% widthratio mis_notas_aprobadas mis_notas_total 100 as pct_rend %}
+                                    {{ pct_rend }}%
+                                    {% else %}0%{% endif %}
+                                </small>
+                            </div>
+                            <div style="height:8px;background:#f0ece0;border-radius:10px;">
+                                <div style="height:8px;width:{% if mis_notas_total %}{{ pct_rend }}{% else %}0{% endif %}%;background:var(--gold);border-radius:10px;transition:width 1s;"></div>
+                            </div>
+                            <small class="text-muted" style="font-size:0.6rem;">{{ mis_notas_aprobadas }} de {{ mis_notas_total }} aprobadas</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3 text-center">
+                    <a href="{% url 'lista_calificaciones' %}" class="btn btn-sm btn-outline-success" style="border-radius:8px;">
+                        <i class="bi bi-graph-up"></i> Ver calificaciones
+                    </a>
+                    <a href="{% url 'lista_asistencias' %}" class="btn btn-sm btn-outline-primary" style="border-radius:8px;">
+                        <i class="bi bi-calendar-check"></i> Ver asistencias
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm" style="border-radius:16px;">
+            <div class="card-header d-flex align-items-center gap-2" style="background:transparent;border-bottom:1px solid #f0ece0;padding:14px 20px;">
+                <i class="bi bi-megaphone" style="color:var(--gold);"></i>
+                <strong style="color:var(--gold);">Anuncios y Directivas</strong>
+            </div>
+            <div class="card-body p-0">
+                {% if anuncios %}
+                <div style="padding:6px;">
+                    {% for a in anuncios %}
+                    <div style="padding:12px;border-bottom:1px solid #f5f2ec;">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <i class="bi bi-megaphone" style="color:var(--gold);font-size:0.8rem;"></i>
+                            <strong style="font-size:0.85rem;color:var(--dark);">{{ a.titulo }}</strong>
+                            <small class="ms-auto text-muted" style="font-size:0.65rem;">{{ a.fecha_creacion|date:'d/m/Y' }}</small>
+                        </div>
+                        <p style="font-size:0.8rem;color:#666;margin:0 0 0 20px;">{{ a.contenido|truncatechars:120 }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state py-3">
+                    <i class="bi bi-megaphone"></i>
+                    <p>No hay anuncios activos.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ROW 4: Recent Attendance #}
+<div class="row mt-3 fade-in">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm" style="border-radius:16px;">
+            <div class="card-header d-flex align-items-center gap-2" style="background:transparent;border-bottom:1px solid #f0ece0;padding:14px 20px;">
+                <i class="bi bi-clock-history" style="color:var(--primary);"></i>
+                <strong style="color:var(--primary);">Últimas asistencias registradas</strong>
+                <a href="{% url 'lista_asistencias' %}" class="btn btn-sm btn-outline-primary ms-auto" style="border-radius:8px;">
+                    <i class="bi bi-eye"></i> Ver todas
+                </a>
+            </div>
+            {% if mis_ultimas_asistencias %}
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr><th>Alumno</th><th>Materia</th><th>Fecha</th><th>Estado</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for a in mis_ultimas_asistencias %}
+                        <tr>
+                            <td class="fw-semibold">{{ a.usuario.get_full_name }}</td>
+                            <td>{{ a.materia.nombre }}</td>
+                            <td>{{ a.fecha|date:"d/m/Y" }}</td>
+                            <td>
+                                <span class="badge-custom badge
+                                    {% if a.estado == 'presente' %}bg-success
+                                    {% elif a.estado == 'tarde' %}bg-warning text-dark
+                                    {% elif a.estado == 'justificada' %}bg-info text-dark
+                                    {% else %}bg-danger{% endif %}">
+                                    {{ a.get_estado_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state py-3">
+                <i class="bi bi-calendar-x"></i>
+                <p>Aún no has registrado asistencias.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if user.rol == 'padre' %}
+<div class="row g-4 mt-2 fade-in">
+    <div class="col-md-5">
+        <div class="card h-100 text-center p-4">
+            <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                <div class="user-avatar mb-3" style="width: 72px; height: 72px; font-size: 1.8rem;">
+                    {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                </div>
+                <h5 class="mb-1">{{ user.get_full_name }}</h5>
+                <span class="badge mb-3" style="background:var(--gold); color:#000;">{{ user.get_rol_display }}</span>
+                <p class="text-muted small">Monitorea el progreso académico de tus hijos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bi bi-heart"></i> Monitoreo de Hijos
+            </div>
+            <div class="card-body d-flex flex-column align-items-start justify-content-center">
+                <p class="text-muted mb-3">Revisa las asistencias y calificaciones de tus hijos en tiempo real.</p>
+                <a href="{% url 'dashboard_padre' %}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-arrow-right"></i> Ver mis hijos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if user.rol == 'director' %}
+<div class="row g-4 mt-2 fade-in">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bi bi-mortarboard-fill"></i> Panel de Dirección
+            </div>
+            <div class="card-body d-flex align-items-center gap-3 flex-wrap">
+                <p class="text-muted mb-0 me-3">Vista general del instituto.</p>
+                <a href="{% url 'dashboard' %}" class="btn btn-primary">
+                    <i class="bi bi-bar-chart"></i> Reportes
+                </a>
+                <a href="{% url 'lista_asignaciones' %}" class="btn btn-success">
+                    <i class="bi bi-journal-text"></i> Asignaciones
+                </a>
+                <a href="{% url 'lista_grados' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-layers"></i> Grados
+                </a>
+                <a href="{% url 'lista_asistencias' %}" class="btn btn-outline-success">
+                    <i class="bi bi-calendar-check"></i> Asistencias
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if user.rol == 'admin' %}
+<div class="row g-4 mt-2 fade-in">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bi bi-lightning-charge"></i> Acciones Rápidas
+            </div>
+            <div class="card-body d-flex gap-2 flex-wrap">
+                <a href="{% url 'crear_grado' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Nuevo Grado
+                </a>
+                <a href="{% url 'dashboard' %}" class="btn btn-success">
+                    <i class="bi bi-bar-chart"></i> Reportes
+                </a>
+                <a href="{% url 'lista_asignaciones' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-journal-text"></i> Asignaciones
+                </a>
+                <a href="{% url 'admin:index' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-gear"></i> Panel Admin
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% if ultimas_asistencias %}
+<div class="row mt-4 fade-in">
+    <div class="col-12">
+        <div class="table-container">
+            <div class="p-3 border-bottom d-flex align-items-center gap-2 flex-wrap" style="background: #faf8f5;">
+                <i class="bi bi-clock-history" style="color:var(--primary);"></i>
+                <strong style="color: var(--primary);">Últimas Asistencias</strong>
+                <input type="text" class="table-search-input form-control form-control-sm ms-auto" placeholder="Buscar..." style="max-width:220px; border-radius:20px; padding:4px 14px;">
+                <span class="badge bg-primary">{{ ultimas_asistencias|length }} registros</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr><th>Usuario</th><th>Fecha</th><th>Estado</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for a in ultimas_asistencias %}
+                        <tr>
+                            <td class="fw-semibold">{{ a.usuario.get_full_name }}</td>
+                            <td>{{ a.fecha|date:"d/m/Y" }}</td>
+                            <td>
+                                <span class="badge-custom badge 
+                                    {% if a.estado == 'presente' %}bg-success
+                                    {% elif a.estado == 'tarde' %}bg-warning text-dark
+                                    {% elif a.estado == 'justificada' %}bg-info text-dark
+                                    {% else %}bg-danger{% endif %}">
+                                    {{ a.get_estado_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endif %}
+
+{% if materias_por_nivel %}
+<hr class="my-5">
+<div class="fade-in">
+    <h4 class="mb-4 d-flex align-items-center gap-2" style="color: var(--primary); font-weight: 700;">
+        <i class="bi bi-book-fill"></i> Plan de Estudios por Nivel
+    </h4>
+
+    {% for nivel, materias in materias_por_nivel.items %}
+    <div class="mb-5">
+        <h5 class="mb-3 d-flex align-items-center gap-2"
+            style="color: {% if nivel == 'Inicial' %}var(--emerald){% elif nivel == 'Primaria' %}var(--primary){% else %}var(--dark){% endif %};">
+            {% if nivel == 'Inicial' %}📚
+            {% elif nivel == 'Primaria' %}📘
+            {% else %}📗{% endif %}
+            <span style="font-weight: 600;">{{ nivel }}</span>
+            <span class="badge rounded-pill"
+                  style="background: {% if nivel == 'Inicial' %}var(--emerald){% elif nivel == 'Primaria' %}var(--primary){% else %}var(--gold){% endif %};
+                         color: #fff; font-size: 0.7rem; font-weight: 500;">
+                {{ materias|length }} materias
+            </span>
+        </h5>
+        <div class="row g-2">
+            {% for materia in materias %}
+            <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+                <div class="subject-card">
+                    <i class="bi bi-journal-text"></i>
+                    <span>{{ materia }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+{% if user.rol == 'admin' or user.rol == 'director' %}
+<script>
+(function() {
+var ctx1 = document.getElementById('attendanceChart');
+if (!ctx1) return;
+try {
+new Chart(ctx1, {
+    type: 'doughnut',
+    data: {
+        labels: ['Presente', 'Tarde', 'Falta', 'Justificada'],
+        datasets: [{
+            data: [
+                {{ asist_presente }}, {{ asist_tarde }}, {{ asist_falta }}, {{ asist_justificada }}
+            ],
+            backgroundColor: ['#C0392B', '#F1C40F', '#dc3545', '#0dcaf0'],
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    },
+    options: {
+        responsive: true,
+        cutout: '60%',
+        plugins: { legend: { position: 'bottom', labels: { padding: 14, usePointStyle: true, font: { size: 11, weight: 'bold' } } } }
+    }
+});
+} catch(e) { ctx1.parentElement.innerHTML = '<p class="text-muted text-center py-4">Sin datos de asistencia</p>'; }
+})();
+</script>
+{% endif %}
+{% endblock %}
