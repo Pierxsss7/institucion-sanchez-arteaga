@@ -370,7 +370,7 @@ body {
 .login-left {
     flex: 0 0 50%;
     position: relative;
-    background: url('/static/img/colegio.jpg') center center / cover no-repeat;
+    background: url('/static/img/colegio.png') center center / cover no-repeat;
     filter: hue-rotate(60deg) saturate(0.8) brightness(0.6);
     display: flex;
     align-items: flex-end;
